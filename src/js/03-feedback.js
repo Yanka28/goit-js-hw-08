@@ -24,7 +24,9 @@ function onInput(event) {
 function onSubmit(event) { 
     event.preventDefault()
     const { email, message } = event.currentTarget.elements
-    console.log({ email: `${email.value}`, message: `${message.value}` });
+    if ((email.value != '') && (message.value != ''))
+    { console.log({ email: `${email.value}`, message: `${message.value}` }); }
+    else alert('не всі дані заповнені')
     event.currentTarget.reset()
     localStorage.clear();
 
