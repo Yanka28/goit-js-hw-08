@@ -1,54 +1,39 @@
 import throttle from 'lodash.throttle';
 
 const formEl = document.querySelector('form')
-const inputEl = document.querySelector('input')
-const textareaEl = document.querySelector('textarea')
-console.dir(inputEl);
-console.dir(textareaEl)
-console.dir(formEl);
 
 formEl.addEventListener('input', throttle(onInput,500))
 formEl.addEventListener('submit', onSubmit)
-window.addEventListener('load', (event) => { 
-    if (FFS_GET) { fillForm() }
-})
-   
-const FFS = 'feedback-form-state'
 
-function onInput(event) {
-    const formObj = Object.fromEntries(new FormData(event.currentTarget))
-    localStorage.setItem(FFS, JSON.stringify(formObj)) 
-   
+const FFS = 'feedback-form-state'
+let formObj = {}
+
+function onInput(e) {
+   formObj[e.target.name] = e.target.value.trim()
+   localStorage.setItem(FFS, JSON.stringify(formObj)) 
 }
  
 function onSubmit(event) { 
     event.preventDefault()
-    const { email, message } = event.currentTarget.elements
-    if ((email.value != '') && (message.value != ''))
-    { console.log({ email: `${email.value}`, message: `${message.value}` }); }
-    else alert('не всі дані заповнені')
+    console.log(formObj);
+    formObj = {}
     event.currentTarget.reset()
-    localStorage.clear();
-
+    localStorage.removeItem(FFS);
 }
 
-const FFS_GET = localStorage.getItem(FFS)
-console.log(FFS_GET);
-
-function fillForm() {
-
-    try {
-        inputEl.value = JSON.parse(FFS_GET).email
-        textareaEl.value = JSON.parse(FFS_GET).message
-        console.log(inputEl.value);
-        console.log(textareaEl.value);
-    }
-      
-    catch (error) {
-        console.log(error);
+const onLoad = () => { 
+    try { 
+        const data = localStorage.getItem(FFS)
+        if (!data) return
+        formObj = JSON.parse(data)
+        Object.entries(formObj).forEach(([key, val]) => { 
+           formEl.elements[key].value = val
+        })
+    } catch (error) { 
+        console.log(error.message);
     }
 }
    
-
+window.addEventListener('load', onLoad)
 
     
